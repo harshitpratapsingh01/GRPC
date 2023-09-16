@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package user;
+
+service UserService {
+  rpc RegisterUser(User) returns (User){};
+  rpc GetUserDetails(UserRequestUsername) returns (User){};
+}
+
+message User {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+
+message UserResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message UserRequestUsername {
+    string username = 1;
+}
