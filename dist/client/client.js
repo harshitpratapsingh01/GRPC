@@ -26,18 +26,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const body_parser_1 = __importDefault(require("body-parser"));
-const dotenv = __importStar(require("dotenv"));
-const user_routes_1 = require("./src/routes/user.routes");
-const app = (0, express_1.default)();
-dotenv.config();
-const port = process.env.PORT;
-app.use(body_parser_1.default.json());
-app.use(body_parser_1.default.urlencoded({ extended: false }));
-app.use(express_1.default.json());
-app.use('/', user_routes_1.userRoutes);
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+const protoLoader = __importStar(require("@grpc/proto-loader"));
+const grpc = __importStar(require("grpc"));
+const path_1 = __importDefault(require("path"));
+const PROTO_PATH = "../src/proto/users.proto";
+const packageDefinition = protoLoader.loadSync(path_1.default.join(__dirname, PROTO_PATH), {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true
 });
-//# sourceMappingURL=server.js.map
+const usersProto = grpc.loadPackageDefinition(packageDefinition);
+const userPackage = usersProto.userPackage;
+const client = new userPackage.UserService("localhost:50051", grpc.credentials.createInsecure());
+exports.default = client;
+//# sourceMappingURL=client.js.map

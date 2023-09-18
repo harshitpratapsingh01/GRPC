@@ -53,6 +53,8 @@ const server = new grpc.Server();
 (0, db_connection_1.dbConnection)();
 server.addService(loginProto.userLogin.LoginService.service, {
     LoginUser: (call, callback) => __awaiter(void 0, void 0, void 0, function* () {
+        console.log(call);
+        console.log(call.request);
         const { email, password } = call.request;
         const isUser = yield user_model_1.User.findOne({
             email: email, password: password

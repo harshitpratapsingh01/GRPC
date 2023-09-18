@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start-server": "tsc && nodemon ./RegisterService/registerUser.ts",
-    "start-client": "tsc && nodemon ./LoginUserService/loginUser.ts",
-    "start": "concurrently 'npm run start-server' 'npm run start-client'"
+    "start-client": "tsc && nodemon server.ts"
   },
   "keywords": [],
   "author": "",

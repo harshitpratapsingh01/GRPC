@@ -49,16 +49,28 @@ const packageDefinition = protoLoader.loadSync(path_1.default.join(__dirname, PR
     oneofs: true
 });
 const usersProto = grpc.loadPackageDefinition(packageDefinition);
+const userPackage = usersProto.userPackage;
 const server = new grpc.Server();
 (0, db_connection_1.dbConnection)();
-server.addService(usersProto.user.UserService.service, {
-    RegisterUser: (call, callback) => __awaiter(void 0, void 0, void 0, function* () {
+server.addService(userPackage.UserService.service, {
+    "RegisterUser": RegisterUser,
+    "GetUserDetails": GetUserDetails,
+    "LoginUser": LoginUser
+});
+function RegisterUser(call, callback) {
+    return __awaiter(this, void 0, void 0, function* () {
         const user = new user_model_1.User(call.request);
         const response = yield user.save();
         console.log(response);
-        callback(null, response);
-    }),
-    GetUserDetails: (call, callback) => __awaiter(void 0, void 0, void 0, function* () {
+        callback(null, {
+            success: true,
+            message: "Signup Successfully",
+            data: response
+        });
+    });
+}
+function GetUserDetails(call, callback) {
+    return __awaiter(this, void 0, void 0, function* () {
         const user = yield user_model_1.User.findOne({ username: call.request.username });
         console.log(user);
         if (user) {
@@ -70,9 +82,33 @@ server.addService(usersProto.user.UserService.service, {
                 details: "Not found"
             });
         }
-    })
-});
-server.bindAsync("127.0.0.1:50051", grpc.ServerCredentials.createInsecure(), () => {
+    });
+}
+function LoginUser(call, callback) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log(call);
+        console.log(call.request);
+        const { email, password } = call.request;
+        const isUser = yield user_model_1.User.findOne({
+            email: email, password: password
+        });
+        console.log(isUser);
+        if (isUser) {
+            callback(null, {
+                success: true,
+                message: "Logged in Successfully",
+                user_data: isUser
+            });
+        }
+        else {
+            callback({
+                code: grpc.status.NOT_FOUND,
+                details: "Not found"
+            });
+        }
+    });
+}
+server.bindAsync("0.0.0.0:50051", grpc.ServerCredentials.createInsecure(), () => {
     server.start();
 });
 console.log("Server running at http://127.0.0.1:50051");
